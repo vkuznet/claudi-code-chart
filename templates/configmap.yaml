@@ -10,9 +10,22 @@ data:
     #!/usr/bin/env bash
     set -euo pipefail
 
+    # ── ensure curl is available ──────────────────────────────────────────
+    # Runs when installCurl=true OR when the image tag looks slim/alpine.
+    _need_curl=false
+    command -v curl &>/dev/null || _need_curl=true
+    {{- if .Values.installCurl }}
+    _need_curl=true
+    {{- end }}
+    if [ "$_need_curl" = "true" ]; then
+      echo "==> curl not found – bootstrapping via apt-get..."
+      apt-get update -qq && apt-get install -y --no-install-recommends curl ca-certificates
+    fi
+
     echo "==> Installing Claude Code..."
     curl -fsSL https://claude.ai/install.sh | bash
     echo "==> Claude Code installed at ~/.local/bin/claude"
+    export PATH=$PATH:~/.local/bin/
 
     # ── model env-vars ────────────────────────────────────────────────────
     export ANTHROPIC_MODEL={{ .Values.models.model | quote }}
