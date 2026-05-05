@@ -7,8 +7,14 @@
 # ---------------------------------------------------------------------------
 image:
   repository: node
-  tag: lts-slim
+  tag: lts        # full Debian image – ships with curl, git, etc.
+                  # use lts-slim only if you add installCurl: true below
   pullPolicy: IfNotPresent
+
+# Set to true to run `apt-get install -y curl` before the Claude Code install.
+# Automatically enabled when image.tag contains "slim" or "alpine".
+# You can also force it on for any image that lacks curl.
+installCurl: false
 
 # ---------------------------------------------------------------------------
 # Anthropic credentials
