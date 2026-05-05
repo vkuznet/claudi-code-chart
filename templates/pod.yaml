@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "claude-code.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "claude-code.labels" . | nindent 4 }}
+    {{- with .Values.podLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  restartPolicy: {{ .Values.restartPolicy }}
+  serviceAccountName: {{ include "claude-code.serviceAccountName" . }}
+
+  # ── init: pull credentials into PATH-accessible location ──────────────
+  # (credentials are already env-vars via envFrom; nothing extra needed)
+
+  containers:
+    - name: claude-code
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+      command: ["/bin/bash", "/entrypoint/entrypoint.sh"]
+
+      # ── Secrets injected as env-vars ──────────────────────────────────
+      envFrom:
+        - secretRef:
+            name: {{ include "claude-code.secretName" . }}
+
+      # ── Volume mounts ─────────────────────────────────────────────────
+      volumeMounts:
+        - name: entrypoint
+          mountPath: /entrypoint
+          readOnly: true
+        {{- range $i, $m := .Values.mounts }}
+        - name: mount-{{ $i }}
+          mountPath: {{ $m.containerPath }}
+          readOnly: {{ eq $m.permission "ro" }}
+        {{- end }}
+
+      {{- with .Values.resources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      # Keep stdin open so interactive `claude` sessions work
+      stdin: true
+      tty: true
+
+  # ── Volumes ───────────────────────────────────────────────────────────
+  volumes:
+    - name: entrypoint
+      configMap:
+        name: {{ include "claude-code.fullname" . }}-entrypoint
+        defaultMode: 0755
+    {{- range $i, $m := .Values.mounts }}
+    - name: mount-{{ $i }}
+      hostPath:
+        path: {{ $m.hostPath }}
+        type: DirectoryOrCreate
+    {{- end }}
+
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

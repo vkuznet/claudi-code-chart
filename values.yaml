@@ -1,0 +1,121 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Claude Code – Helm values
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ---------------------------------------------------------------------------
+# Image used for the Pod.  node:lts-slim is small and ships with bash + curl.
+# ---------------------------------------------------------------------------
+image:
+  repository: node
+  tag: lts-slim
+  pullPolicy: IfNotPresent
+
+# ---------------------------------------------------------------------------
+# Anthropic credentials
+#
+# Option A (recommended): reference an EXISTING Secret in the same namespace.
+#   Set existingSecret to the Secret name and leave inlineSecret empty.
+#
+# Option B: let the chart CREATE a Secret from the values below.
+#   Leave existingSecret empty and fill in inlineSecret.* .
+#   WARNING: values are stored in Helm history – use sealed-secrets or
+#   external-secrets in production instead.
+# ---------------------------------------------------------------------------
+anthropic:
+  # Name of a pre-existing Secret.  When set, inlineSecret is ignored.
+  existingSecret: ""
+
+  # Keys inside the Secret that map to environment variables.
+  # Change these only if your Secret uses different key names.
+  secretKeys:
+    authToken: ANTHROPIC_AUTH_TOKEN        # → ANTHROPIC_AUTH_TOKEN
+    baseUrl:   ANTHROPIC_BASE_URL          # → ANTHROPIC_BASE_URL
+
+  # Inline Secret – created by the chart when existingSecret is "".
+  inlineSecret:
+    ANTHROPIC_AUTH_TOKEN: ""              # e.g. sk-ant-…
+    ANTHROPIC_BASE_URL:   "https://api.anthropic.com/"
+
+# ---------------------------------------------------------------------------
+# Model overrides – all optional.
+# These become plain env-vars (not secrets).
+# ---------------------------------------------------------------------------
+models:
+  # Primary model used by Claude Code
+  model: "anthropic.claude-sonnet-4-5"
+  # Small/fast background model
+  smallFastModel: "anthropic.claude-haiku-4-5"
+  defaultOpusModel:   "anthropic.claude-opus-4-5"
+  defaultHaikuModel:  "anthropic.claude-haiku-4-5"
+  defaultSonnetModel: "anthropic.claude-sonnet-4-5"
+
+# ---------------------------------------------------------------------------
+# Behaviour flags
+# ---------------------------------------------------------------------------
+flags:
+  # Disable experimental beta headers (required for most gateways)
+  disableExperimentalBetas: true
+  # Disable Anthropic telemetry / Statsig A/B testing
+  disableTelemetry: true
+
+# ---------------------------------------------------------------------------
+# Optional prompt
+#
+# When set, Claude Code is invoked non-interactively:
+#   claude --print "<prompt>"
+# When empty the container drops into an interactive shell that has all
+# env-vars exported, so you can run `claude` manually.
+# ---------------------------------------------------------------------------
+prompt: ""
+
+# ---------------------------------------------------------------------------
+# Host-directory mounts
+#
+# Each entry mounts a directory from the *node* into the container.
+# permission: "ro"  → readOnly: true
+# permission: "rw"  → readOnly: false
+#
+# Example:
+#   mounts:
+#     - hostPath: /home/alice/project
+#       containerPath: /workspace/project
+#       permission: rw
+#     - hostPath: /data/reference
+#       containerPath: /workspace/reference
+#       permission: ro
+# ---------------------------------------------------------------------------
+mounts: []
+# - hostPath: /path/on/node
+#   containerPath: /workspace/mydir
+#   permission: rw   # or ro
+
+# ---------------------------------------------------------------------------
+# Kubernetes object settings
+# ---------------------------------------------------------------------------
+namespace: default
+
+serviceAccount:
+  create: true
+  name: ""          # auto-generated when empty
+  annotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+# Resource requests/limits for the Pod
+resources: {}
+# resources:
+#   requests:
+#     cpu: "500m"
+#     memory: "512Mi"
+#   limits:
+#     cpu: "2"
+#     memory: "2Gi"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# RestartPolicy for the Pod.
+# Use "Never" for one-shot jobs, "Always" for an interactive/long-running pod.
+restartPolicy: Never

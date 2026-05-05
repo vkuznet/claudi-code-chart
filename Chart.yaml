@@ -1,0 +1,10 @@
+apiVersion: v2
+name: claude-code
+description: >
+  Runs Claude Code (claude.ai CLI) inside a Kubernetes Pod.
+  Installs the CLI on startup, mounts host directories with configurable
+  permissions, injects Anthropic credentials from a Secret, and optionally
+  executes a non-interactive prompt.
+type: application
+version: 0.1.0
+appVersion: "latest"

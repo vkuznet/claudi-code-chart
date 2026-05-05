@@ -1,0 +1,36 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Claude Code  –  {{ .Release.Name }}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Pod name : {{ include "claude-code.fullname" . }}
+Namespace: {{ .Values.namespace }}
+
+{{- if .Values.prompt }}
+Non-interactive mode: the pod will run your prompt and exit.
+
+  kubectl logs -n {{ .Values.namespace }} {{ include "claude-code.fullname" . }} -f
+
+{{- else }}
+Interactive mode: attach to the pod after it is Running.
+
+  kubectl attach -it -n {{ .Values.namespace }} {{ include "claude-code.fullname" . }}
+
+  # Inside the container, Claude Code is on PATH:
+  claude
+
+{{- end }}
+
+{{- if not .Values.anthropic.existingSecret }}
+⚠  Credentials are stored in a chart-managed Secret.
+   For production use, create the Secret externally and set:
+     anthropic.existingSecret: <your-secret-name>
+{{- end }}
+
+Mounted directories:
+{{- if .Values.mounts }}
+{{- range .Values.mounts }}
+  {{ .hostPath }}  →  {{ .containerPath }}  ({{ .permission }})
+{{- end }}
+{{- else }}
+  (none)
+{{- end }}
