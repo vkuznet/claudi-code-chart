@@ -21,7 +21,11 @@ spec:
 
   containers:
     - name: claude-code
+      {{- if .Values.customImage }}
+      image: {{ .Values.customImage }}
+      {{- else }}
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      {{- end }}
       imagePullPolicy: {{ .Values.image.pullPolicy }}
 
       command: ["/bin/bash", "/entrypoint/entrypoint.sh"]

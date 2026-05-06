@@ -7,6 +7,24 @@ On every start the container installs the latest CLI via the official install sc
 - executes a **non-interactive prompt** and exits.
 
 ---
+## Build custom image
+
+```
+# we can build custom claude image using provided Docker file
+
+# step 0: obtain github token from your repo (see settings)
+
+# step 1: login to your github repo with token credentials
+echo `cat ~/private/github-token` | docker login ghcr.io -u <username> --password-stdin
+
+# step 2: build your image
+docker build -t ghcr.io/<username>/claude-cli:latest .
+
+# step 3: upload your image to your GHCR area
+docker push ghcr.io/<username>/claude-cli:latest
+```
+
+---
 
 ## Quick start
 
