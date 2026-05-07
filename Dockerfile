@@ -1,0 +1,29 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install only what we need (no recommends)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    vim \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser
+
+USER appuser
+WORKDIR /home/appuser
+
+# Install Claude CLI (as non-root user)
+RUN curl -fsSL https://claude.ai/install.sh -o /tmp/install.sh \
+    && chmod +x /tmp/install.sh \
+    && /tmp/install.sh \
+    && rm /tmp/install.sh
+
+# Ensure user-local bin is in PATH
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
+CMD ["/bin/bash"]
