@@ -19,6 +19,16 @@ spec:
   # ── init: pull credentials into PATH-accessible location ──────────────
   # (credentials are already env-vars via envFrom; nothing extra needed)
 
+  initContainers:
+    - name: install-tools
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      command: ["/bin/bash", "/entrypoint/entrypoint.sh"]
+      envFrom:
+        - secretRef:
+            name: {{ include "claude-code.secretName" . }}
+      volumeMounts:
+        - name: entrypoint
+          mountPath: /entrypoint
   containers:
     - name: claude-code
       {{- if .Values.customImage }}
@@ -28,7 +38,8 @@ spec:
       {{- end }}
       imagePullPolicy: {{ .Values.image.pullPolicy }}
 
-      command: ["/bin/bash", "/entrypoint/entrypoint.sh"]
+      #command: ["/bin/bash", "/entrypoint/entrypoint.sh"]
+      command: ["/bin/bash"]
 
       # ── Secrets injected as env-vars ──────────────────────────────────
       envFrom:
