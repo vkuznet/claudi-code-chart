@@ -1,10 +1,8 @@
 # claude-code Helm chart
 
 Runs **Claude Code** (`claude` CLI) inside a Kubernetes Pod.  
-On every start the container installs the latest CLI via the official install script, exports your Anthropic credentials from a Kubernetes Secret, mounts the host directories you specify, then either:
-
-- drops into an **interactive shell** (default), or  
-- executes a **non-interactive prompt** and exits.
+You can build your own container or use default debian one where
+claude client will be installed via official install script.
 
 ---
 ## Build custom image
@@ -29,20 +27,20 @@ docker push ghcr.io/<username>/claude-cli:latest
 ## Quick start
 
 ```bash
-# 1. (Recommended) create the Secret yourself so the token never touches Helm history
+# create claude namespace and create the Secret with your URL/token
 kubectl create namespace claude
 kubectl create secret generic claude-anthropic \
   --namespace claude \
   --from-literal=ANTHROPIC_AUTH_TOKEN=sk-ant-… \
   --from-literal=ANTHROPIC_BASE_URL=https://api.ai.../
 
-# 2. Install the chart, pointing at your pre-existing secret
+# Install the chart, pointing at your pre-existing secret
 helm install claude-code ./claude-code \
   --namespace claude \
   -f values-local.yaml \
   --set anthropic.existingSecret=claude-anthropic
 
-# 3. Attach interactively
+# Attach interactively
 kubectl attach -it -n claude claude-code-claude-code
 ```
 
