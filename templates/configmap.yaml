@@ -36,6 +36,8 @@ data:
 
     # ── credentials come from the mounted Secret (already in env) ─────────
     # ANTHROPIC_AUTH_TOKEN and ANTHROPIC_BASE_URL are injected via envFrom.
+    #
+    echo "Claude is installed"
 
     {{- if .Values.prompt }}
     echo "==> Running non-interactive prompt..."
