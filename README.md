@@ -44,6 +44,24 @@ helm install claude-code ./claude-code \
 kubectl attach -it -n claude claude-code-claude-code
 ```
 
+#### Run ollama with claude:
+The provided Dockerfile (image) also provides ollama CLI which
+you can use to start local ollama server and run ollama with claude
+model. For instance, here is a recipe to run ollama claude with
+gpt-oss model.
+
+
+```
+# start ollama server
+nohup ollama serve 2>&1 1>& ollama.log < /dev/null &
+
+# run ollama with claude
+ollama launch claude --model gpt-oss
+```
+
+For more openly available models please visit
+[ollama library](https://ollama.com/library/) and select your favorite one.
+
 ---
 
 ## Key values
