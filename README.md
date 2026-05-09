@@ -55,20 +55,17 @@ gpt-oss model.
 # start ollama server
 nohup ollama serve 2>&1 1>& ollama.log < /dev/null &
 
-# run ollama with claude
-ollama launch claude --model gpt-oss
+# pull some models
+ollama pull gpt-oss:20b-cloud
+ollama run opencoder
+ollama list
 
 # if ollama ask to login in for a specific model
 # you may use
-# links2 https://... or lynx https://... or w3m http://...
-ollama launch claude --model kimi-k2.6:cloud
-  To use   kimi-k2.6:cloud, please sign in.
+ollama singin
 
-  Navigate to:
-    https://ollama.com/connect?name=claude-code-claude-
-    code&key=...
-
-links2 https://ollama.com/...
+# run ollama with claude
+ollama launch claude --model gpt-oss:20b-cloud
 ```
 
 For more openly available models please visit
