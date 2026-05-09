@@ -57,6 +57,18 @@ nohup ollama serve 2>&1 1>& ollama.log < /dev/null &
 
 # run ollama with claude
 ollama launch claude --model gpt-oss
+
+# if ollama ask to login in for a specific model
+# you may use
+# links2 https://... or lynx https://... or w3m http://...
+ollama launch claude --model kimi-k2.6:cloud
+  To use   kimi-k2.6:cloud, please sign in.
+
+  Navigate to:
+    https://ollama.com/connect?name=claude-code-claude-
+    code&key=...
+
+links2 https://ollama.com/...
 ```
 
 For more openly available models please visit
