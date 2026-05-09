@@ -76,7 +76,7 @@ spec:
     - name: mount-{{ $i }}
       hostPath:
         path: {{ $m.hostPath }}
-        type: DirectoryOrCreate
+        type: Directory
     {{- end }}
 
   {{- with .Values.nodeSelector }}
